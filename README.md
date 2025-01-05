@@ -84,7 +84,7 @@ These changes will be applied once you execute `terraform apply`. The command wi
 
 It's essential to keep your Terraform state file secure since it contains sensitive information.
 
-## Walkthrough - Resource Creation
+## Resource Created
 
 Azure Virtual Networks (VNETs) enable communication between resources. Network Interface Cards (NICs) connect to VNETs, allowing VMs and other resources within Azure to communicate seamlessly. NICs connect with subnets within VNETs without requiring additional configuration.
 
