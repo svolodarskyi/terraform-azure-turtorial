@@ -1,98 +1,62 @@
-note: we can manage envoronment by creating configurations in different folders
-instead of 'workspaces'
+## 1. Authenticating to Azure using a Service Principal
 
-### 1. Authenticate to Azure with service principal (using cloud
+To authenticate with Azure, you can utilize a service principal through various methods such as Cloud Shell, the Azure portal, or Bash.
 
-shell/portal/bash)
-https://learn.microsoft.com/en-us/azure/developer/terraform/authenticate-to-azure-with-service-principle?tabs=bash
+## 2. Key Terraform Commands
 
-### 2. Main terraform commands `terraform init` prepairs working directory for
+- **`terraform init`**: Prepares the working directory for subsequent commands.
+- **`terraform validate`**: Verifies whether the configuration is valid.
+- **`terraform plan`**: Displays the changes that will occur based on the current configuration, allowing you to preview what will happen when applying the Terraform configuration.
+- **`terraform apply`**: Executes the changes specified in the configuration.
+- **`terraform destroy`**: Removes the infrastructure that was previously created.
+- To view all available commands, simply type `terraform`.
 
-other commands `terraform validate` checks whethere the configuration is valid
+## 3. Managing Workspaces in Terraform CLI
 
-`terraform plan` shows all the changes will taking place with current
-configuration. we can see what's going to happen when we apply terraform config
+Note that environments can be managed by organizing configurations into different folders instead of using workspaces.
 
-`terraform apply`
+Terraform Workspaces allow for separate instances of state data within a single working directory, effectively enabling environment separation.
 
-`terraform destroy` destroys previously-created infrastructure
+In contrast, Terraform Cloud Workspaces create distinct working directories, while CLI workspaces operate within the same directory but generate different files.
 
-type `terraform` and see all the commands
+- **`terraform workspace show`**: Displays the current workspace.
+- **`terraform workspaces list`**: Lists all existing workspaces.
+- **`terraform workspace select <name>`**: Switches to a specified workspace.
+- **`terraform workspaces new dev`**: Creates a new workspace for development purposes.
 
-### 3. Common commands to managed
+## 4. Understanding Terraform State
 
-workspaces within the terraform terminal (terraform cli workspaces)
+The state file serves to link real-world resources to your configuration, track metadata, and enhance performance for large infrastructures.
 
-Terraform Workspaces are a way to create separate instances of state data within
-the same working directory. Sort of - the way to separate envornments within
-same directory.
+State files are formatted in JSON and should not be edited manually.
 
-Terraform Cloud Workspaces create separate workign directory while with the
-terraform CLI workspaces we are workign with teh same directory but its creating
-separate files.
+By default, state files are stored locally as `terraform.tfstate`, but they can also be saved remotely in Terraform Cloud or cloud storage services.
 
-`terraform workspace show`
+State files are refreshed to align with actual infrastructure, ensuring consistency between what exists and what is defined in the state file. For instance, if resources are modified directly in Azure and no longer match the state file, an import request will be made to update the state file accordingly.
 
-`terraform workspaces list`
+Maintaining alignment between the state file and Azure resources is crucial to avoid potential issues.
 
-`terraform workspace select <name>`
+## 5. Resource Blocks in Terraform
 
-`terraform workspaces new dev` - create new terraform worspace for development
-environment
+Resource blocks are fundamental components of Terraform that define one or more infrastructure objects such as virtual machines (VMs) and virtual networks (VNETs).
 
-### 4. Terraform State
+Resources are not created until the `terraform apply` command is executed. Once real infrastructure is established, these objects are updated in the state file. This allows for future updates or deletions of infrastructure based on existing resource blocks by comparing them with the state file and making necessary adjustments.
 
-The state file maps real world resources to our configuration, keeps track of
-metadata, and improves performance ofr large infrustructures.
+Resource blocks declare specific types of resources and allow you to specify parameters such as name, location, SKU, and operating system.
 
-tfstate file are in json. we shold not edit the file manually
+## 6. Providers in Terraform
 
-By default, state fiels are stored locally as `terraform.tfstate` we can store
-it remotely in terrafor mcloud or cloud storage accounts
+Terraform requires "providers" to interact with cloud services or APIs; without them, resource creation is not possible. Declaring a provider is essential for starting any Terraform project.
 
-State files refreshes to udate the state with the real infra to make sure the
-things already match up
+Most providers configure specific object types such as:
 
-for example if we have reasource blocks that are already associated to
-infrastructure in the state file and already exist in azure portal, if we update
-the resources in azure portal and since its no longer matches teh state file -
-what it will do is to ask to import that resource so it is up-to date with your
-real infra.
+- Infrastructure
+- Naming conventions
+- Random number generation
 
-Thta's why its important that the state file and azur eresources do match, otehr
-wise it can cause issues to a state file.
+These providers simplify infrastructure implementation and configuration management.
 
-### 5. terraform resource blocks
-
-key foundation of terraform. They describe one of more infra objects: VM, VNETS
-etc.
-
-While writgin the configuration in config files the resources are not created
-until we run command `terraform apply`. When eventyually the real infra
-created - the objets are updated in the state file. This allows to updated
-/detroy infra in the next iterations for the resource blocks that have already
-have an associated object - it will compare stete file to make sure it is
-matches and will make any updates to the object if nessesary.
-
-resoure block dreclare resource of a given type and allows to define the params
-of the resource: the nae location, sv, etc ,sku, operatgin system.
-
-### 6. terraform providers
-
-Terraform relies on "providers" to interact with cloud providers or otehr api.
-Without providers we can not create any reasource. We need to declare terraform
-provider to even get started with terraform.
-
-Most providers configure specific types of objects, such as :
-
-- infra
-- naming conventions
-- generating random numbers
-
-Just to help implement and simplify the infra and configurations.
-
-docs for azure provider
-https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs
+For example, here's how to declare an Azure provider:
 
 ```
 terraform {
@@ -105,57 +69,30 @@ terraform {
 }
 ```
 
-after the configured the provider - we need to install the provide to make sure
-we can utilize in our environment.
+After configuring a provider, it must be installed to ensure it functions correctly within your environment. Running `terraform init` checks for providers and installs them while adding them to your state file.
 
-`terraform init` it will take a look at providers and make sure it is installed
-and added to our state file.
+![alt text](./image.png)
 
-![alt text](image.png)
+## 7. Creating Your First Resource Group
 
-### 7. Declare first resource group
 
-```
-resource "azurerm_resource_group" "main" {
-  name = "learn-tf-rg-eastus"
-  location = "eastus"
-}
-```
 
-Now that we have our first config blck created, we can open the terminal up, mke
-sure we are authenticated.
+With your first configuration block ready, open your terminal and ensure you are authenticated. Execute `terraform plan` to see which resources will be created; if no changes appear, confirm that your configuration file is saved.
 
-`terraform plan` - and see which resources will be created. if no changes - make
-sure the the config file is saved.
-
-Give it a second while it is running plan as it is trying to match up with your
-resource block with the state file.
+While running `terraform plan`, it will take some time as it matches your resource block with the state file.
 
 ![alt text](image-1.png)
 
-These are the changes that will be applied once we run `terraform apply`.
-
-`terrafor apply`
+These changes will be applied once you execute `terraform apply`. The command will prompt you for confirmation before proceeding with the actions.
 
 ![alt text](image-2.png)
 
-it will prompt to confirm if we want terraform to perform the actions.
+It's essential to keep your Terraform state file secure since it contains sensitive information.
 
-make sure to keep terraform state file safe as it contans sensitive information.
+## Walkthrough - Resource Creation
 
-WALK THROUGH - RESOURCES CREATION
+Azure Virtual Networks (VNETs) enable communication between resources. Network Interface Cards (NICs) connect to VNETs, allowing VMs and other resources within Azure to communicate seamlessly. NICs connect with subnets within VNETs without requiring additional configuration.
 
-Azure VNETS allow resources talk to each other
+For demonstration purposes, VNICs will be created without public interfaces so that VMs remain inaccessible from the internet. This setup enhances security by restricting external communication.
 
-NICs will be attached to VNETS and vnics allow VMs talk to each other or
-communicate with different resources witin azure env. vnics are connected to
-subnets vithin Vnets. They can connect with other vnics within virtual networks
-or subnets without any configuration.
-
-for the purposes of the demo VNIC will be created without public interface - VMs
-would not be publicly accessed over the internet. so htis will be within virtual
-network and subnet just created. vnics add additional layer of security since it
-would not be able to communicate over the internet.
-
-materials are based on linkedin learning course
-https://www.linkedin.com/learning/introduction-to-terraform-on-azure
+The materials referenced are based on a LinkedIn Learning course on [Terraform in Azure](https://www.linkedin.com/learning/introduction-to-terraform-on-azure).
