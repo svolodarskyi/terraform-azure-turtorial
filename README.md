@@ -71,7 +71,6 @@ terraform {
 
 After configuring a provider, it must be installed to ensure it functions correctly within your environment. Running `terraform init` checks for providers and installs them while adding them to your state file.
 
-![alt text](./image.png)
 
 ## 7. Creating Your First Resource Group
 
@@ -81,11 +80,7 @@ With your first configuration block ready, open your terminal and ensure you are
 
 While running `terraform plan`, it will take some time as it matches your resource block with the state file.
 
-![alt text](image-1.png)
-
 These changes will be applied once you execute `terraform apply`. The command will prompt you for confirmation before proceeding with the actions.
-
-![alt text](image-2.png)
 
 It's essential to keep your Terraform state file secure since it contains sensitive information.
 
